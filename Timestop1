@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Timer & Stopwatch</title>
+
+  <!-- For PWA / iPhone home screen -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Timer & Stopwatch">
+  <link rel="apple-touch-icon" href="icon-192.png">
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      display: flex;
+      gap: 40px;
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+
+    .box {
+      text-align: center;
+      width: 250px;
+    }
+
+    h2 { margin-bottom: 10px; }
+    .time { font-size: 2.5rem; margin: 15px 0; }
+    button { margin: 5px; padding: 8px 14px; font-size: 1rem; cursor: pointer; }
+    input { width: 60px; padding: 5px; text-align: center; font-size: 1rem; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- TIMER -->
+  <div class="box">
+    <h2>Timer</h2>
+    <div>
+      <input id="minutes" type="number" placeholder="Min" min="0">
+      <input id="seconds" type="number" placeholder="Sec" min="0" max="59">
+    </div>
+    <div class="time" id="timerDisplay">00:00</div>
+    <button onclick="startTimer()">Start</button>
+    <button onclick="pauseTimer()">Pause</button>
+    <button onclick="resetTimer()">Reset</button>
+  </div>
+
+  <!-- STOPWATCH -->
+  <div class="box">
+    <h2>Stopwatch</h2>
+    <div class="time" id="stopwatchDisplay">00:00.00</div>
+    <button onclick="startStopwatch()">Start</button>
+    <button onclick="pauseStopwatch()">Pause</button>
+    <button onclick="resetStopwatch()">Reset</button>
+  </div>
+
+</div>
+
+<script>
+  // TIMER
+  let timerInterval;
+  let remainingTime = 0;
+
+  function startTimer() {
+    if (remainingTime === 0) {
+      const min = parseInt(document.getElementById("minutes").value) || 0;
+      const sec = parseInt(document.getElementById("seconds").value) || 0;
+      remainingTime = min * 60 + sec;
+    }
+    if (timerInterval || remainingTime <= 0) return;
+    timerInterval = setInterval(() => {
+      remainingTime--;
+      updateTimerDisplay();
+      if (remainingTime <= 0) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        alert("Timer finished!");
+      }
+    }, 1000);
+  }
+
+  function pauseTimer() { clearInterval(timerInterval); timerInterval = null; }
+  function resetTimer() { pauseTimer(); remainingTime = 0; updateTimerDisplay(); }
+  function updateTimerDisplay() {
+    const m = Math.floor(remainingTime / 60);
+    const s = remainingTime % 60;
+    document.getElementById("timerDisplay").textContent =
+      `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  }
+
+  // STOPWATCH
+  let stopwatchInterval;
+  let elapsedTime = 0;
+
+  function startStopwatch() {
+    if (stopwatchInterval) return;
+    stopwatchInterval = setInterval(() => {
+      elapsedTime += 10;
+      updateStopwatchDisplay();
+    }, 10);
+  }
+
+  function pauseStopwatch() { clearInterval(stopwatchInterval); stopwatchInterval = null; }
+  function resetStopwatch() { pauseStopwatch(); elapsedTime = 0; updateStopwatchDisplay(); }
+  function updateStopwatchDisplay() {
+    const ms = Math.floor((elapsedTime % 1000) / 10);
+    const sec = Math.floor((elapsedTime / 1000) % 60);
+    const min = Math.floor(elapsedTime / 60000);
+    document.getElementById("stopwatchDisplay").textContent =
+      `${String(min).padStart(2,'0')}:${String(sec).padStart(2,'0')}.${String(ms).padStart(2,'0')}`;
+  }
+</script>
+
+</body>
+</html>
